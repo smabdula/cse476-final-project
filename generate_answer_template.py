@@ -34,9 +34,20 @@ def build_answers(questions: List[Dict[str, Any]]) -> List[Dict[str, str]]:
     answers = []
     for idx, question in enumerate(questions, start=1):
         txt = question["input"]
-        prompt = "Give only the final answer. \nQuestion: " + txt
+        divider = question.get("domain", None)
+        if divider == "math":
+            instruct = "Solve the problem and only give the final number. "
+        elif divider == "logic":
+            instruct = " Reason carefully and only give the final answer. "
+        else :
+            instruct = "Only give the final answer"
+        prompt = instruct + "\nQuestion: " + txt
         response = call_model_chat_completions(prompt)
-        ans = response["text"].strip()
+        if response and response.get("text") is not None:
+            text = response.get("text", "")
+        else:
+            text = ""
+        ans = text.strip()
         answers.append({"output": ans})
     return answers
 
