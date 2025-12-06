@@ -42,12 +42,23 @@ def build_answers(questions: List[Dict[str, Any]]) -> List[Dict[str, str]]:
         else :
             instruct = "Only give the final answer"
         prompt = instruct + "\nQuestion: " + txt
-        response = call_model_chat_completions(prompt)
-        if response and response.get("text") is not None:
-            text = response.get("text", "")
+        numCalls = 2 if divider in ("math", "logic") else 1
+        outputs = []
+        for i in range(numCalls):
+            response = call_model_chat_completions(prompt)
+            if response and response.get("text") is not None:
+                text = response.get("text", "")
+            else:
+                text = ""
+            outputs.append(text.strip())
+        if len(outputs) == 1:
+            ans = outputs[0]
         else:
-            text = ""
-        ans = text.strip()
+            if outputs[0] == outputs[1]:
+                ans = outputs[0]
+            else:
+                ans = outputs[1]
+                
         answers.append({"output": ans})
     return answers
 
