@@ -24,7 +24,7 @@ OUTPUT_PATH = Path("cse_476_final_project_answers.json")
 
 def load_questions(path: Path) -> List[Dict[str, Any]]:
     with path.open("r", encoding="utf-8") as fp:
-        data = json.load(fp)
+        data = json.load(fp) 
     if not isinstance(data, list):
         raise ValueError("Input file must contain a list of question objects.")
     return data
@@ -63,7 +63,7 @@ def build_answers(questions: List[Dict[str, Any]]) -> List[Dict[str, str]]:
             badAns = True
         elif len(ans) > 200:
             badAns = True
-        elif divider == "math" and ans.isalpha():
+        elif divider == "math" and not any(ch.isdigit() for ch in ans):
             badAns = True
         if badAns:
             newPromt = (" Your previous answer was incorrect. Only output the final answer. \nQuestion: " + txt)
@@ -98,8 +98,6 @@ def validate_results(
 
 def main() -> None:
     questions = load_questions(INPUT_PATH)
-    questions = questions[:5]
-
     answers = build_answers(questions)
 
     with OUTPUT_PATH.open("w") as fp:
