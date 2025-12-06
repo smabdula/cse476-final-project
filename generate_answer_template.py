@@ -58,7 +58,19 @@ def build_answers(questions: List[Dict[str, Any]]) -> List[Dict[str, str]]:
                 ans = outputs[0]
             else:
                 ans = outputs[1]
-                
+        badAns = False
+        if not ans or ans.strip() == "":
+            badAns = True
+        elif len(ans) > 200:
+            badAns = True
+        elif divider == "math" and ans.isalpha():
+            badAns = True
+        if badAns:
+            newPromt = (" Your previous answer was incorrect. Only output the final answer. \nQuestion: " + txt)
+            newAns = call_model_chat_completions(newPromt)
+            if newAns and newAns.get("text", "").strip() is not None:
+                ans = newAns.get("text", "").strip()
+
         answers.append({"output": ans})
     return answers
 
